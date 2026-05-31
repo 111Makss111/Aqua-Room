@@ -1,3 +1,5 @@
+/* Base */
+
 * {
   box-sizing: border-box;
 }
@@ -42,6 +44,8 @@ h2 {
   margin: 0;
 }
 
+/* Accessibility helpers */
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -53,6 +57,8 @@ h2 {
   white-space: nowrap;
   border: 0;
 }
+
+/* Aquarium shell */
 
 .aquarium-shell {
   position: relative;
@@ -117,6 +123,8 @@ h2 {
   inset: 0;
   pointer-events: none;
 }
+
+/* Aquarium life layers */
 
 .tank-layer-back {
   background:
@@ -274,6 +282,8 @@ h2 {
   mix-blend-mode: screen;
 }
 
+/* Top navigation and auth */
+
 .topbar,
 .hero-content {
   position: relative;
@@ -379,6 +389,8 @@ h2 {
   font-size: 14px;
 }
 
+/* Main landmark */
+
 .hero-content {
   display: grid;
   grid-template-columns: 1fr;
@@ -434,6 +446,8 @@ h2 {
   visibility: hidden;
 }
 
+/* Motion */
+
 @keyframes water-current {
   from {
     transform: translate3d(-1.5%, -0.5%, 0) scale(1.02);
@@ -476,6 +490,8 @@ h2 {
   }
 }
 
+/* Responsive */
+
 @media (max-width: 820px) {
   .topbar,
   .hero-content {
@@ -509,6 +525,8 @@ h2 {
     width: min(292px, calc(100vw - 28px));
   }
 }
+
+/* Reduced motion */
 
 @media (prefers-reduced-motion: reduce) {
   *,

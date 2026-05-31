@@ -77,8 +77,6 @@ export function LoginMenu({ googleReady, isOpen, user }: LoginMenuProps) {
       buttonContainer,
       googleButtonOptions
     );
-    setStatus('Google sign-in is ready.');
-    setStatusTone('ok');
   }, [googleReady, isOpen, user]);
 
   if (!isOpen || user) {
