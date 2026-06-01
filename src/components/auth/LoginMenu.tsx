@@ -1,94 +1,27 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { createUserFromGoogleCredential } from '@/lib/googleCredential';
-import { saveRoomUser } from '@/lib/roomSession';
-import type { RoomUser } from '@/types/auth';
-import type { GoogleButtonOptions } from '@/types/google';
-
-const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-const SETUP_MESSAGE = 'Continue with Google';
+import type { Session } from 'next-auth';
+import { signIn } from 'next-auth/react';
 
 type LoginMenuProps = {
-  googleReady: boolean;
   isOpen: boolean;
-  user: RoomUser | null;
+  user: Session['user'] | null;
 };
 
-type AuthTone = 'muted' | 'ok' | 'warn';
-
-const googleButtonOptions: GoogleButtonOptions = {
-  locale: 'uk',
-  shape: 'pill',
-  size: 'large',
-  text: 'signin_with',
-  theme: 'outline',
-  type: 'standard',
-};
-
-const getInitialStatus = () => {
-  if (!GOOGLE_CLIENT_ID) {
-    return SETUP_MESSAGE;
-  }
-
-  return 'Loading Google sign-in.';
-};
-
-export function LoginMenu({ googleReady, isOpen, user }: LoginMenuProps) {
-  const buttonContainerRef = useRef<HTMLDivElement>(null);
-  const [status, setStatus] = useState(getInitialStatus);
-  const [statusTone, setStatusTone] = useState<AuthTone>(
-    GOOGLE_CLIENT_ID ? 'muted' : 'warn'
-  );
-
-  useEffect(() => {
-    const buttonContainer = buttonContainerRef.current;
-
-    if (!isOpen || user || !buttonContainer) {
-      return;
-    }
-
-    if (!GOOGLE_CLIENT_ID) {
-      buttonContainer.innerHTML =
-        '<button class="google-placeholder-button" type="button" disabled>Google</button>';
-      return;
-    }
-
-    if (!googleReady || !window.google?.accounts.id) {
-      return;
-    }
-
-    window.google.accounts.id.initialize({
-      client_id: GOOGLE_CLIENT_ID,
-      callback: response => {
-        if (!response.credential) {
-          setStatus('Google did not return a sign-in credential.');
-          setStatusTone('warn');
-          return;
-        }
-
-        const nextUser = createUserFromGoogleCredential(response.credential);
-        saveRoomUser(nextUser);
-      },
-    });
-
-    buttonContainer.innerHTML = '';
-    window.google.accounts.id.renderButton(
-      buttonContainer,
-      googleButtonOptions
-    );
-  }, [googleReady, isOpen, user]);
-
+export function LoginMenu({ isOpen, user }: LoginMenuProps) {
   if (!isOpen || user) {
     return null;
   }
 
   return (
     <section className="auth-menu" id="login-menu" aria-label="Google login">
-      <div className="google-button-shell" ref={buttonContainerRef} />
-      <p className="auth-status" data-tone={statusTone} role="status">
-        {status}
-      </p>
+      <button
+        className="google-auth-button"
+        type="button"
+        onClick={() => signIn('google', { redirectTo: '/room' })}
+      >
+        Continue with Google
+      </button>
     </section>
   );
 }

@@ -8,24 +8,24 @@ Private Next.js + TypeScript project for a calm Google-protected entry screen.
 src/app/
   layout.tsx        App shell and metadata
   page.tsx          Home route
+  room/page.tsx     Private room placeholder after login
   globals.css      Global styles split into visual sections
 
 src/components/
   HomeScreen.tsx    Assembles the page sections
   aquarium/         Aquarium background, water movement, geyser
-  auth/             Google login menu
+  auth/             Auth provider and Google login menu
   layout/           Top navigation
-
-src/hooks/
-  useRoomSession.ts Reads the browser session state
+  room/             Private room placeholder components
 
 src/lib/
-  googleCredential.ts Parses the Google credential
-  roomSession.ts      Saves and clears the local session
+  Reserved for app helpers as the project grows
 
-src/types/
-  auth.ts           App user type
-  google.ts         Google Identity Services types
+src/app/api/auth/
+  [...nextauth]/route.ts Auth.js server route for Google OAuth
+
+src/auth.ts         Auth.js configuration
+proxy.ts            Protects private routes
 ```
 
 ### Local setup
@@ -34,7 +34,10 @@ src/types/
 2. Add a Google OAuth web client ID:
 
 ```env
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+AUTH_SECRET=generate-a-long-random-secret
+AUTH_GOOGLE_ID=your-google-oauth-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
+AUTH_URL=http://localhost:3000
 ```
 
 3. Run the app:
@@ -54,20 +57,34 @@ npm run dev
 5. Go to `APIs & Services` -> `Credentials`.
 6. Create `OAuth client ID`.
 7. Choose `Web application`.
-8. Add this authorized JavaScript origin for local development:
+8. Add these authorized redirect URIs:
 
 ```text
-http://localhost:3000
+http://localhost:3000/api/auth/callback/google
+https://your-project.vercel.app/api/auth/callback/google
 ```
 
-9. Copy the client ID into `.env.local`:
+9. Copy the client ID and client secret into `.env.local`:
 
 ```env
-NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_ID=your-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_SECRET=your-client-secret
 ```
 
-10. Restart the dev server after changing `.env.local`.
+10. Add an auth secret to `.env.local`:
 
-Current login is only the first browser-side layer. Before adding private data,
-database access, or sensitive features, add server-side verification of the
-Google credential and the extra protection layer we discussed.
+```env
+AUTH_SECRET=some-long-random-string
+```
+
+11. Keep the local URL in `.env.local`:
+
+```env
+AUTH_URL=http://localhost:3000
+```
+
+12. Restart the dev server after changing `.env.local`.
+
+The app now uses Auth.js / NextAuth for a server-side OAuth callback and a
+cookie-backed session. Before adding sensitive data, we should still add the
+extra protection layer we discussed.

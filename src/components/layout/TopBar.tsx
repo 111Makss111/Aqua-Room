@@ -1,20 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { clearRoomUser } from '@/lib/roomSession';
-import type { RoomUser } from '@/types/auth';
+import type { Session } from 'next-auth';
+import { signOut } from 'next-auth/react';
 import { LoginMenu } from '@/components/auth/LoginMenu';
 
 type TopBarProps = {
-  googleReady: boolean;
   loginOpen: boolean;
   onLoginToggle: () => void;
   onLogout: () => void;
-  user: RoomUser | null;
+  user: Session['user'] | null;
 };
 
 export function TopBar({
-  googleReady,
   loginOpen,
   onLoginToggle,
   onLogout,
@@ -23,8 +21,8 @@ export function TopBar({
   const firstName = user?.name?.split(' ')[0] || 'there';
 
   const handleLogout = () => {
-    clearRoomUser();
     onLogout();
+    signOut({ redirectTo: '/' });
   };
 
   return (
@@ -48,7 +46,6 @@ export function TopBar({
             </button>
 
             <LoginMenu
-              googleReady={googleReady}
               isOpen={loginOpen}
               user={user}
             />
@@ -56,6 +53,9 @@ export function TopBar({
         ) : (
           <div className="session-actions">
             <span>Welcome, {firstName}</span>
+            <Link className="room-link" href="/room">
+              Room
+            </Link>
             <button className="logout-button" type="button" onClick={handleLogout}>
               Exit
             </button>
