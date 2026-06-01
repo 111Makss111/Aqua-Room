@@ -37,7 +37,6 @@ proxy.ts            Protects private routes
 AUTH_SECRET=generate-a-long-random-secret
 AUTH_GOOGLE_ID=your-google-oauth-client-id.apps.googleusercontent.com
 AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
-AUTH_URL=http://localhost:3000
 ```
 
 3. Run the app:
@@ -77,13 +76,7 @@ AUTH_GOOGLE_SECRET=your-client-secret
 AUTH_SECRET=some-long-random-string
 ```
 
-11. Keep the local URL in `.env.local`:
-
-```env
-AUTH_URL=http://localhost:3000
-```
-
-12. Restart the dev server after changing `.env.local`.
+11. Restart the dev server after changing `.env.local`.
 
 The app now uses Auth.js / NextAuth for a server-side OAuth callback and a
 cookie-backed session. Before adding sensitive data, we should still add the
@@ -108,7 +101,6 @@ Add these Environment Variables in Vercel:
 AUTH_SECRET=your-long-random-secret
 AUTH_GOOGLE_ID=your-google-oauth-client-id.apps.googleusercontent.com
 AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
-AUTH_URL=https://your-project.vercel.app
 ```
 
 After adding or changing variables, redeploy the project from the Vercel
@@ -117,3 +109,7 @@ dashboard. Google must also have the exact Vercel callback URL:
 ```text
 https://your-project.vercel.app/api/auth/callback/google
 ```
+
+`AUTH_URL` is optional for this project. If you do set it, keep only one value
+per environment: `http://localhost:3000` locally, and the exact Vercel domain in
+Vercel.
