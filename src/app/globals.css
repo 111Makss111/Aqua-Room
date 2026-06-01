@@ -287,12 +287,12 @@ h2 {
 .topbar,
 .hero-content {
   position: relative;
-  z-index: 1;
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto;
 }
 
 .topbar {
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -364,6 +364,7 @@ h2 {
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
+  z-index: 30;
   width: 292px;
   border: 1px solid rgb(229 255 219 / 0.24);
   border-radius: 8px;
@@ -448,6 +449,7 @@ h2 {
 /* Main landmark */
 
 .hero-content {
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
