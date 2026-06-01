@@ -88,3 +88,32 @@ AUTH_URL=http://localhost:3000
 The app now uses Auth.js / NextAuth for a server-side OAuth callback and a
 cookie-backed session. Before adding sensitive data, we should still add the
 extra protection layer we discussed.
+
+### Vercel setup
+
+In Vercel, import the GitHub repository and keep these project settings:
+
+```text
+Framework Preset: Next.js
+Root Directory: ./
+Build Command: npm run build
+Output Directory: leave empty/default
+Install Command: npm install
+Production Branch: main
+```
+
+Add these Environment Variables in Vercel:
+
+```env
+AUTH_SECRET=your-long-random-secret
+AUTH_GOOGLE_ID=your-google-oauth-client-id.apps.googleusercontent.com
+AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
+AUTH_URL=https://your-project.vercel.app
+```
+
+After adding or changing variables, redeploy the project from the Vercel
+dashboard. Google must also have the exact Vercel callback URL:
+
+```text
+https://your-project.vercel.app/api/auth/callback/google
+```
