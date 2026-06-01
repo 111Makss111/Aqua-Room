@@ -40,7 +40,8 @@ a {
 
 p,
 h1,
-h2 {
+h2,
+h3 {
   margin: 0;
 }
 
@@ -395,33 +396,170 @@ h2 {
 /* Private room */
 
 .room-shell {
+  position: relative;
   display: grid;
   min-height: 100vh;
+  overflow: hidden;
   padding: 28px;
   color: #f7fff8;
   background:
-    radial-gradient(circle at 22% 18%, rgb(98 169 76 / 0.24), transparent 28%),
-    radial-gradient(circle at 78% 28%, rgb(35 112 74 / 0.28), transparent 34%),
-    linear-gradient(135deg, #07100b 0%, #0b1b10 52%, #041008 100%);
+    radial-gradient(circle at 18% 12%, rgb(138 212 105 / 0.18), transparent 28%),
+    radial-gradient(circle at 78% 18%, rgb(45 173 142 / 0.16), transparent 32%),
+    radial-gradient(circle at 54% 100%, rgb(194 151 63 / 0.12), transparent 34%),
+    linear-gradient(135deg, #030604 0%, #07120d 44%, #03100b 100%);
+}
+
+.room-shell::before,
+.room-shell::after,
+.room-watermark {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+}
+
+.room-shell::before {
+  background:
+    linear-gradient(115deg, transparent 0 28%, rgb(255 255 255 / 0.07) 30%, transparent 34% 100%),
+    linear-gradient(68deg, transparent 0 62%, rgb(180 255 214 / 0.05) 64%, transparent 68% 100%);
+  mix-blend-mode: screen;
+  animation: water-light-drift 15s ease-in-out infinite alternate;
+}
+
+.room-shell::after {
+  background:
+    linear-gradient(to right, rgb(0 0 0 / 0.7), transparent 18% 82%, rgb(0 0 0 / 0.74)),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.42), transparent 26% 76%, rgb(0 0 0 / 0.66));
+  box-shadow:
+    inset 0 0 0 10px rgb(0 0 0 / 0.7),
+    inset 0 28px 60px rgb(255 255 255 / 0.06);
+}
+
+.room-watermark {
+  opacity: 0.2;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 38px,
+      rgb(204 255 220 / 0.08) 40px 42px,
+      transparent 44px 96px
+    ),
+    radial-gradient(ellipse at 50% 12%, rgb(186 255 203 / 0.12), transparent 48%);
+  filter: blur(12px);
+  mix-blend-mode: screen;
+  animation: water-current 20s ease-in-out infinite alternate;
 }
 
 .room-panel {
+  position: relative;
+  z-index: 1;
   display: grid;
-  align-content: space-between;
-  width: min(100%, 980px);
+  grid-template-rows: auto auto 1fr;
+  gap: clamp(28px, 5vw, 56px);
+  width: min(1180px, 100%);
   min-height: calc(100vh - 56px);
   margin: 0 auto;
 }
 
-.room-back-link {
-  width: fit-content;
-  color: rgb(247 255 248 / 0.78);
+.room-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.room-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #f7fff8;
+  font-size: 18px;
   font-weight: 750;
+  text-shadow: 0 16px 34px rgb(0 0 0 / 0.62);
+}
+
+.room-user-panel {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(100%, 520px);
+  border: 1px solid rgb(229 255 219 / 0.18);
+  border-radius: 8px;
+  padding: 8px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.04)),
+    rgb(4 18 12 / 0.58);
+  box-shadow: 0 22px 70px rgb(0 0 0 / 0.3);
+  backdrop-filter: blur(22px) saturate(1.25);
+}
+
+.room-avatar {
+  display: grid;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgb(230 255 220 / 0.28);
+  border-radius: 8px;
+  color: #f7fff8;
+  font-size: 13px;
+  font-weight: 850;
+  background:
+    radial-gradient(circle at 28% 22%, rgb(232 255 214 / 0.92), transparent 18%),
+    linear-gradient(135deg, #166f3a, #0a3a27);
+}
+
+.room-user-copy {
+  display: grid;
+  min-width: 0;
+  color: rgb(247 255 248 / 0.72);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.room-user-copy strong,
+.room-user-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-user-copy strong {
+  color: #f7fff8;
+  font-size: 14px;
+}
+
+.room-exit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  border: 1px solid rgb(229 255 219 / 0.28);
+  border-radius: 999px;
+  padding: 0 15px;
+  color: #f7fff8;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  background: rgb(3 14 10 / 0.52);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.room-exit-button:hover {
+  border-color: rgb(229 255 219 / 0.48);
+  background: rgb(21 58 34 / 0.62);
+  transform: translateY(-1px);
+}
+
+.room-hero {
+  max-width: 780px;
 }
 
 .room-copy {
   max-width: 620px;
-  padding-bottom: clamp(42px, 11vh, 120px);
 }
 
 .room-kicker {
@@ -434,16 +572,213 @@ h2 {
 }
 
 .room-copy h1 {
-  margin-bottom: 16px;
-  font-size: clamp(42px, 8vw, 92px);
-  line-height: 0.95;
+  max-width: 720px;
+  margin-bottom: 18px;
+  font-size: clamp(44px, 8vw, 94px);
+  line-height: 0.94;
+  letter-spacing: 0;
 }
 
 .room-copy p:last-child {
-  max-width: 520px;
+  max-width: 600px;
   color: rgb(247 255 248 / 0.72);
   font-size: 18px;
   line-height: 1.65;
+}
+
+.room-workspace {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding-bottom: 20px;
+}
+
+.room-menu,
+.room-work-panel {
+  border: 1px solid rgb(229 255 219 / 0.14);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.09), rgb(255 255 255 / 0.035)),
+    rgb(3 13 9 / 0.54);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 0.26);
+  backdrop-filter: blur(18px) saturate(1.18);
+}
+
+.room-menu {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.room-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 14px;
+  color: rgb(247 255 248 / 0.78);
+  text-align: left;
+  background: transparent;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.room-menu-button:hover,
+.room-menu-button.is-active {
+  border-color: rgb(229 255 219 / 0.22);
+  color: #f7fff8;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.room-menu-button:hover {
+  transform: translateY(-1px);
+}
+
+.room-menu-button span {
+  font-weight: 850;
+}
+
+.room-menu-button small {
+  color: rgb(204 245 179 / 0.68);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.room-work-panel {
+  min-height: 380px;
+  padding: clamp(22px, 4vw, 34px);
+}
+
+.room-panel-kicker {
+  margin-bottom: 10px;
+  color: rgb(204 245 179 / 0.82);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.room-work-panel h2 {
+  margin-bottom: 12px;
+  color: #f7fff8;
+  font-size: clamp(34px, 5vw, 62px);
+  line-height: 1;
+}
+
+.room-work-panel > p {
+  max-width: 620px;
+  color: rgb(247 255 248 / 0.68);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.room-empty-state {
+  display: grid;
+  gap: 8px;
+  margin-top: clamp(34px, 6vw, 74px);
+  border: 1px dashed rgb(229 255 219 / 0.2);
+  border-radius: 8px;
+  padding: 22px;
+  color: rgb(247 255 248 / 0.66);
+  background: rgb(2 10 7 / 0.32);
+}
+
+.room-empty-state span {
+  color: rgb(204 245 179 / 0.72);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.room-empty-state strong {
+  color: #f7fff8;
+  font-size: 24px;
+}
+
+.room-empty-state p {
+  max-width: 520px;
+  line-height: 1.55;
+}
+
+.room-tables-stack {
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+}
+
+.room-table-card {
+  overflow: hidden;
+  border: 1px solid rgb(229 255 219 / 0.14);
+  border-radius: 8px;
+  background: rgb(2 10 7 / 0.3);
+}
+
+.room-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgb(229 255 219 / 0.1);
+  padding: 14px 16px;
+}
+
+.room-table-header h3 {
+  color: #f7fff8;
+  font-size: 18px;
+}
+
+.room-table-header span {
+  color: rgb(204 245 179 / 0.72);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.room-table-scroll {
+  overflow-x: auto;
+}
+
+.room-excel-table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+}
+
+.room-excel-table th,
+.room-excel-table td {
+  min-width: 126px;
+  border-right: 1px solid rgb(3 45 41 / 0.56);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.room-excel-table th {
+  color: #032323;
+  font-size: 12px;
+  font-weight: 850;
+  line-height: 1.15;
+  background: #12d8d2;
+}
+
+.room-excel-table td {
+  height: 44px;
+  color: rgb(247 255 248 / 0.38);
+  background: rgb(255 255 255 / 0.025);
+}
+
+.room-excel-table th:nth-child(12),
+.room-excel-table th:nth-child(13),
+.room-excel-table th:nth-child(14) {
+  background: #f2a014;
 }
 
 /* Main landmark */
@@ -574,7 +909,56 @@ h2 {
   }
 
   .room-panel {
+    gap: 30px;
     min-height: calc(100vh - 40px);
+  }
+
+  .room-topbar,
+  .room-user-panel {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .room-user-panel {
+    width: 100%;
+  }
+
+  .room-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .room-menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .room-shell {
+    padding: 14px;
+  }
+
+  .room-panel {
+    min-height: calc(100vh - 28px);
+  }
+
+  .room-user-panel {
+    padding: 10px;
+  }
+
+  .room-user-copy {
+    max-width: 100%;
+  }
+
+  .room-copy h1 {
+    font-size: clamp(38px, 16vw, 58px);
+  }
+
+  .room-menu {
+    grid-template-columns: 1fr;
+  }
+
+  .room-work-panel {
+    padding: 18px;
   }
 }
 

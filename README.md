@@ -101,6 +101,7 @@ Add these Environment Variables in Vercel:
 AUTH_SECRET=your-long-random-secret
 AUTH_GOOGLE_ID=your-google-oauth-client-id.apps.googleusercontent.com
 AUTH_GOOGLE_SECRET=your-google-oauth-client-secret
+AUTH_REDIRECT_PROXY_URL=https://your-project.vercel.app/api/auth
 ```
 
 After adding or changing variables, redeploy the project from the Vercel
@@ -113,3 +114,6 @@ https://your-project.vercel.app/api/auth/callback/google
 `AUTH_URL` is optional for this project. If you do set it, keep only one value
 per environment: `http://localhost:3000` locally, and the exact Vercel domain in
 Vercel.
+
+`AUTH_REDIRECT_PROXY_URL` keeps OAuth stable on Vercel preview/deployment URLs.
+Use your stable production domain plus `/api/auth`.
