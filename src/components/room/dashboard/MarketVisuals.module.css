@@ -1,0 +1,95 @@
+.chartBox {
+  min-height: 318px;
+  display: grid;
+  align-items: end;
+}
+
+.chartBox svg {
+  width: 100%;
+  height: 318px;
+}
+
+.grid {
+  fill: none;
+  stroke: #e9eef7;
+  stroke-width: 1;
+}
+
+.axisLabel,
+.xLabel {
+  fill: #94a3b8;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.xLabel {
+  fill: #64748b;
+  text-anchor: middle;
+}
+
+.line {
+  fill: none;
+  stroke: #6366f1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.fill {
+  fill: #6366f1;
+  opacity: 0.12;
+}
+
+.endpoint {
+  fill: #6366f1;
+  stroke: #ffffff;
+  stroke-width: 3;
+  filter: drop-shadow(0 6px 12px rgb(99 102 241 / 0.28));
+}
+
+.allocationGrid {
+  display: grid;
+  grid-template-columns: 210px minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  min-height: 306px;
+}
+
+.donut {
+  width: 190px;
+  height: 190px;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, #ffffff 0 42%, transparent 43%),
+    var(--allocation, conic-gradient(#6366f1 0 100%));
+  box-shadow: inset 0 0 0 1px #eef2f7;
+}
+
+.legend {
+  display: grid;
+  gap: 18px;
+}
+
+.legend div {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.legend span {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+}
+
+.legend strong {
+  color: #334155;
+  font-size: 14px;
+}
+
+.legend small {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 900;
+}

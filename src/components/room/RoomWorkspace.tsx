@@ -3,6 +3,7 @@
 import type { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { PortfolioDashboard } from './dashboard/PortfolioDashboard';
 
 type RoomWorkspaceProps = {
   user: Session['user'];
@@ -13,7 +14,7 @@ const AUTO_QUOTE_REFRESH_MS = 60_000;
 const MAX_PRICE_SNAPSHOTS = 32;
 
 const accountFilters = [
-  { id: 'all', label: 'Усі акаунти', detail: 'Разом' },
+  { id: 'all', label: 'Загальний капітал', detail: 'Разом' },
   { id: 'ibkr', label: 'IBKR', detail: 'Брокер' },
   { id: 'xtb', label: 'XTB', detail: 'Брокер' },
 ] as const;
@@ -483,267 +484,6 @@ function calculatePortfolioMarketValue(
 
     return total + (quote ? holding.quantity * quote.price : holding.cost);
   }, 0);
-}
-
-function createSnapshotChartPoints(priceSnapshots: PriceSnapshot[]) {
-  if (priceSnapshots.length < 2) {
-    return '';
-  }
-
-  const values = priceSnapshots.map(snapshot => snapshot.value);
-  let min = Math.min(...values);
-  let max = Math.max(...values);
-
-  if (min === max) {
-    const padding = Math.max(Math.abs(max) * 0.01, 1);
-
-    min -= padding;
-    max += padding;
-  }
-
-  const left = 38;
-  const right = 618;
-  const top = 52;
-  const bottom = 214;
-  const range = max - min;
-
-  return priceSnapshots
-    .map((snapshot, index) => {
-      const progress = index / (priceSnapshots.length - 1);
-      const x = left + (right - left) * progress;
-      const y = bottom - ((snapshot.value - min) / range) * (bottom - top);
-
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(' ');
-}
-
-function DashboardOverview({
-  holdings,
-  marketQuotes,
-  onOpenLedger,
-  onRefreshQuotes,
-  priceSnapshots,
-  quoteStatus,
-  quoteUpdatedAt,
-  summary,
-  transactions,
-}: {
-  holdings: HoldingRow[];
-  marketQuotes: Record<string, MarketQuote>;
-  onOpenLedger: () => void;
-  onRefreshQuotes: () => void;
-  priceSnapshots: PriceSnapshot[];
-  quoteStatus: QuoteStatus;
-  quoteUpdatedAt: string;
-  summary: LedgerSummary;
-  transactions: LedgerTransaction[];
-}) {
-  const holdingValues = holdings.map(holding => {
-    const quote = marketQuotes[holding.ticker.toUpperCase()];
-    const currentValue = quote ? holding.quantity * quote.price : holding.cost;
-    const pnl = quote ? currentValue - holding.cost : 0;
-
-    return {
-      currentValue,
-      hasQuote: Boolean(quote),
-      pnl,
-    };
-  });
-  const currentValue = holdingValues.reduce(
-    (total, holding) => total + holding.currentValue,
-    0
-  );
-  const unrealizedPnl = holdingValues.reduce((total, holding) => total + holding.pnl, 0);
-  const quotedCount = holdingValues.filter(holding => holding.hasQuote).length;
-  const chartPoints = createSnapshotChartPoints(priceSnapshots);
-  const chartPointList = chartPoints ? chartPoints.split(' ') : [];
-  const latestChartPoint =
-    chartPointList.length > 0
-      ? chartPointList[chartPointList.length - 1].split(',')
-      : [];
-  const latestSnapshot = priceSnapshots[priceSnapshots.length - 1];
-  const previousSnapshot = priceSnapshots[priceSnapshots.length - 2];
-  const snapshotDelta =
-    latestSnapshot && previousSnapshot ? latestSnapshot.value - previousSnapshot.value : 0;
-  const metricCards = [
-    {
-      label: 'Поточна вартість',
-      value: formatMoney(currentValue),
-      hint:
-        quotedCount > 0
-          ? `${quotedCount} позицій з ринковою ціною`
-          : 'Поки за собівартістю',
-    },
-    {
-      label: 'Вкладено',
-      value: formatMoney(summary.invested),
-      hint: summary.hasMixedCurrencies ? 'Є різні валюти' : 'З журналу купівель',
-    },
-    {
-      label: 'Нереалізований PnL',
-      value: formatMoney(unrealizedPnl),
-      hint: quotedCount > 0 ? 'З ринкових цін' : 'Очікує оновлення цін',
-    },
-    {
-      label: 'Операцій',
-      value: String(summary.operationCount),
-      hint: 'Локальний журнал',
-    },
-  ];
-
-  return (
-    <div className="dashboard-grid">
-      <div className="metric-row">
-        {metricCards.map(card => (
-          <article className="metric-card" key={card.label}>
-            <span>{card.label}</span>
-            <strong>{card.value}</strong>
-            <small>{card.hint}</small>
-          </article>
-        ))}
-      </div>
-
-      <section className="dashboard-card performance-card">
-        <div className="card-heading">
-          <div>
-            <span>Динаміка</span>
-            <h2>Графік вартості</h2>
-          </div>
-          <button
-            className="text-action-button"
-            type="button"
-            onClick={onRefreshQuotes}
-          >
-            {quoteStatus === 'loading' ? 'Оновлюю...' : 'Оновити ціни'}
-          </button>
-        </div>
-
-        <div className="chart-shell" aria-label="Графік вартості портфеля">
-          <svg viewBox="0 0 640 260" role="img">
-            <path
-              d="M30 220H610M30 170H610M30 120H610M30 70H610"
-              className="chart-grid-line"
-            />
-            {chartPoints ? (
-              <>
-                <polygon
-                  className="chart-main-fill"
-                  points={`${chartPoints} 618,240 38,240`}
-                />
-                <polyline className="chart-main-line" points={chartPoints} />
-                <circle
-                  className="chart-live-dot"
-                  cx={latestChartPoint[0] ?? '618'}
-                  cy={latestChartPoint[1] ?? '52'}
-                  r="5"
-                />
-              </>
-            ) : (
-              <>
-                <path
-                  d="M38 214C96 198 120 177 174 184C234 192 248 132 304 146C366 162 380 78 430 94C486 112 502 62 562 72C584 76 600 64 618 52"
-                  className="chart-main-line"
-                />
-                <path
-                  d="M38 214C96 198 120 177 174 184C234 192 248 132 304 146C366 162 380 78 430 94C486 112 502 62 562 72C584 76 600 64 618 52V240H38Z"
-                  className="chart-main-fill"
-                />
-              </>
-            )}
-          </svg>
-          <div className="chart-empty-label">
-            <strong>
-              {latestSnapshot
-                ? formatMoney(latestSnapshot.value)
-                : quotedCount > 0
-                  ? 'Ціни підтягнуті'
-                  : 'Ринкові ціни ще не оновлені'}
-            </strong>
-            <span>
-              {latestSnapshot
-                ? `${
-                    snapshotDelta >= 0 ? '+' : ''
-                  }${formatMoney(snapshotDelta)} з останнього оновлення`
-                : quoteUpdatedAt
-                ? `Останнє оновлення: ${new Date(quoteUpdatedAt).toLocaleString('uk-UA')}`
-                : 'Натисни “Оновити ціни”, щоб підтягнути ринок через API.'}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      <aside className="dashboard-side-stack">
-        <section className="dashboard-card">
-          <div className="card-heading">
-            <div>
-              <span>Розподіл</span>
-              <h2>Класи активів</h2>
-            </div>
-          </div>
-          <div className="allocation-layout">
-            <div className="allocation-donut" aria-hidden="true" />
-            <div className="allocation-list">
-              <div>
-                <span>Позицій</span>
-                <strong>{holdings.length}</strong>
-              </div>
-              <div>
-                <span>Активів у журналі</span>
-                <strong>{new Set(holdings.map(holding => holding.ticker)).size}</strong>
-              </div>
-              <div>
-                <span>Ринкових цін</span>
-                <strong>
-                  {quotedCount} / {holdings.length}
-                </strong>
-              </div>
-              <div>
-                <span>Валюти</span>
-                <strong>{summary.hasMixedCurrencies ? 'Кілька' : 'Одна'}</strong>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="dashboard-card">
-          <div className="card-heading">
-            <div>
-              <span>Останні операції</span>
-              <h2>Журнал</h2>
-            </div>
-            <button className="text-action-button" type="button" onClick={onOpenLedger}>
-              Відкрити
-            </button>
-          </div>
-          <TransactionList transactions={transactions.slice(0, 4)} compact />
-        </section>
-      </aside>
-
-      <section className="dashboard-card table-card">
-        <div className="card-heading">
-          <div>
-            <span>Активи</span>
-            <h2>Позиції за журналом</h2>
-          </div>
-          <small>{quotedCount > 0 ? 'З поточними цінами' : 'Очікує ціни API'}</small>
-        </div>
-        <HoldingsTable holdings={holdings.slice(0, 5)} marketQuotes={marketQuotes} />
-      </section>
-
-      <section className="dashboard-card action-card">
-        <span>Наступний крок</span>
-        <h2>Пошук активу + ціни</h2>
-        <p>
-          У журналі можна знайти актив по назві, підтягнути поточну ціну і
-          залишити точну ціну угоди для історії та майбутнього FIFO.
-        </p>
-        <button className="primary-action-button" type="button" onClick={onOpenLedger}>
-          Перейти до журналу
-        </button>
-      </section>
-    </div>
-  );
 }
 
 function LedgerModule({
@@ -1655,48 +1395,55 @@ export function RoomWorkspace({ user }: RoomWorkspaceProps) {
         </div>
       </aside>
 
-      <section className="dashboard-main">
-        <header className="dashboard-header">
-          <div>
-            <span className="dashboard-kicker">Приватний кабінет</span>
-            <h1>{activeNav.title}</h1>
-            <p>{activeNav.subtitle}</p>
-          </div>
+      <section
+        className={`dashboard-main ${
+          activeNavId === 'dashboard' ? 'is-portfolio-dashboard' : ''
+        }`}
+      >
+        {activeNavId !== 'dashboard' ? (
+          <header className="dashboard-header">
+            <div>
+              <span className="dashboard-kicker">Приватний кабінет</span>
+              <h1>{activeNav.title}</h1>
+              <p>{activeNav.subtitle}</p>
+            </div>
 
-          <div className="dashboard-controls" aria-label="Фільтри кабінету">
-            <div className="account-tabs" aria-label="Перемикач акаунтів">
-              {accountFilters.map(account => (
-                <button
-                  className={account.id === activeAccountId ? 'is-active' : ''}
-                  key={account.id}
-                  type="button"
-                  aria-pressed={account.id === activeAccountId}
-                  onClick={() => setActiveAccountId(account.id)}
-                >
-                  <span>{account.label}</span>
-                  <small>{account.detail}</small>
-                </button>
-              ))}
+            <div className="dashboard-controls" aria-label="Фільтри кабінету">
+              <div className="account-tabs" aria-label="Перемикач акаунтів">
+                {accountFilters.map(account => (
+                  <button
+                    className={account.id === activeAccountId ? 'is-active' : ''}
+                    key={account.id}
+                    type="button"
+                    aria-pressed={account.id === activeAccountId}
+                    onClick={() => setActiveAccountId(account.id)}
+                  >
+                    <span>{account.label}</span>
+                    <small>{account.detail}</small>
+                  </button>
+                ))}
+              </div>
+              <div
+                className={`dashboard-status ${
+                  quoteStatus === 'ready' ? 'is-live' : ''
+                }`}
+              >
+                {liveMarketStatus}
+              </div>
             </div>
-            <div
-              className={`dashboard-status ${
-                quoteStatus === 'ready' ? 'is-live' : ''
-              }`}
-            >
-              {liveMarketStatus}
-            </div>
-          </div>
-        </header>
+          </header>
+        ) : null}
 
         {activeNavId === 'dashboard' ? (
-          <DashboardOverview
+          <PortfolioDashboard
+            accountOptions={accountFilters}
+            activeAccountId={activeAccountId}
             holdings={holdings}
             marketQuotes={marketQuotes}
-            onOpenLedger={() => setActiveNavId('ledger')}
+            onAccountChange={id => setActiveAccountId(id as AccountFilterId)}
             onRefreshQuotes={() => void refreshMarketQuotes()}
             priceSnapshots={priceSnapshots}
             quoteStatus={quoteStatus}
-            quoteUpdatedAt={quoteUpdatedAt}
             summary={summary}
             transactions={scopedTransactions}
           />

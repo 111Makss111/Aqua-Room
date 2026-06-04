@@ -1,0 +1,94 @@
+.surface {
+  min-height: 100vh;
+  padding: 28px;
+  color: #111827;
+  background: #f8fafc;
+}
+
+.header,
+.headerTools,
+.accountTabs {
+  display: flex;
+  align-items: center;
+}
+
+.header {
+  justify-content: space-between;
+  gap: 22px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 22px;
+}
+
+.header h1 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+}
+
+.header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.headerTools {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.syncPill,
+.currencyPill,
+.accountTabs button {
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.syncPill {
+  padding: 9px 16px;
+  color: #059669;
+  background: #dcfce7;
+}
+
+.currencyPill {
+  padding: 9px 16px;
+  color: #475569;
+  background: #eef2f7;
+}
+
+.accountTabs {
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0;
+}
+
+.accountTabs button {
+  padding: 10px 18px;
+  color: #64748b;
+  background: #e8edf5;
+}
+
+.accountTabs button.active {
+  color: #ffffff;
+  background: #6366f1;
+  box-shadow: 0 12px 24px rgb(99 102 241 / 0.24);
+}
+
+.metricsGrid,
+.visualGrid {
+  display: grid;
+  gap: 22px;
+}
+
+.metricsGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.visualGrid {
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+  margin-top: 24px;
+}

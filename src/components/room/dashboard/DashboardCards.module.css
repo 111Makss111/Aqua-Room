@@ -1,0 +1,84 @@
+.metricCard,
+.panelCard {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 16px 40px rgb(15 23 42 / 0.04);
+}
+
+.metricCard {
+  display: grid;
+  gap: 7px;
+  min-height: 132px;
+  padding: 24px;
+}
+
+.metricCard span {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.metricCard strong {
+  color: #111827;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1;
+}
+
+.metricCard small,
+.green {
+  color: #10b981;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.orange {
+  color: #f59e0b;
+}
+
+.panelCard {
+  min-height: 430px;
+  padding: 26px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cardHeader h2 {
+  margin: 0 0 4px;
+  color: #111827;
+  font-size: 18px;
+}
+
+.cardHeader p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.periodTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.periodTabs button {
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 10px;
+  color: #64748b;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  background: #f1f5f9;
+}
+
+.periodTabs button.active {
+  color: #ffffff;
+  background: #6366f1;
+}

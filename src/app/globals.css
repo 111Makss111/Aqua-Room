@@ -1251,6 +1251,11 @@ h3 {
   padding: 24px 28px 28px;
 }
 
+.dashboard-main.is-portfolio-dashboard {
+  padding: 0;
+  background: #f8fafc;
+}
+
 .dashboard-header {
   display: flex;
   align-items: flex-start;
