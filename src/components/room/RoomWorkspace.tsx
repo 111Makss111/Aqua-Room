@@ -42,10 +42,10 @@ const navigationItems = [
   },
   {
     id: 'analyzer',
-    label: 'Аналіз акцій',
-    marker: 'SA',
-    title: 'Stock Analyzer',
-    subtitle: 'Перевірка тікера, ризиків, ціни входу та рішення Pass / Warning / Reject.',
+    label: 'Фільтр акцій',
+    marker: 'RF',
+    title: 'Місячний фільтр акцій',
+    subtitle: 'Перевірка списку ідей, ризиків і розподіл бюджету тільки між buy.',
   },
   {
     id: 'ledger',
@@ -1032,9 +1032,9 @@ function ModulePreview({ activeId }: { activeId: NavigationId }) {
       text: 'Поточний розділ активів має окремий екран.',
     },
     analyzer: {
-      tag: 'Аналіз',
-      title: 'Stock Analyzer',
-      text: 'Поточний розділ аналізу акцій має окремий екран.',
+      tag: 'Фільтр',
+      title: 'Місячний фільтр',
+      text: 'Поточний розділ перевіряє список кандидатів і ділить бюджет між тими, хто пройшов ризик-фільтр.',
     },
     ledger: {
       tag: 'Журнал',

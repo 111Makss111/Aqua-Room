@@ -1,6 +1,8 @@
 export type FilterDecision = 'Pass' | 'Warning' | 'Reject';
 export type FinalOpinion = 'Strong Buy' | 'Buy' | 'Hold' | 'Avoid' | 'High Risk / Speculative';
 export type ProfitStatus = 'profit' | 'loss' | 'neutral';
+export type MonthlyDecision = 'buy' | 'watch' | 'avoid';
+export type RiskLevel = 'low' | 'medium' | 'high';
 
 export type StockNewsItem = {
   title: string;
@@ -55,4 +57,24 @@ export type StockAnalysisResult = {
   filterDecision: FilterDecision;
   finalOpinion: FinalOpinion;
   finalExplanation: string;
+};
+
+export type StockCandidateResult = {
+  symbol: string;
+  companyName: string;
+  currentPrice: number | null;
+  score: number;
+  riskLevel: RiskLevel;
+  decision: MonthlyDecision;
+  investmentAmount: number;
+  reasons: string[];
+  warnings: string[];
+};
+
+export type MonthlyFilterResult = {
+  budget: number;
+  buyCount: number;
+  allocationPerStock: number;
+  candidates: StockCandidateResult[];
+  rejected: StockCandidateResult[];
 };

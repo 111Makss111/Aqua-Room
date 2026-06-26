@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { StockAnalysisResult } from '@/lib/stockAnalyzer/types';
-import { AnalyzerResult } from './AnalyzerResult';
+import type { MonthlyFilterResult as MonthlyFilterResultType } from '@/lib/stockAnalyzer/types';
+import { MonthlyFilterResult } from './MonthlyFilterResult';
 import styles from './StockAnalyzer.module.css';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -8,17 +8,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function StockAnalyzer() {
-  const [tickerSymbol, setTickerSymbol] = useState('');
-  const [entryPrice, setEntryPrice] = useState('');
-  const [result, setResult] = useState<StockAnalysisResult | null>(null);
+  const [budget, setBudget] = useState('300');
+  const [candidates, setCandidates] = useState('MRVL HIMX AAPL AMD');
+  const [result, setResult] = useState<MonthlyFilterResultType | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   async function handleAnalyze() {
-    const query = tickerSymbol.trim();
-
-    if (!query) {
-      setErrorMessage('Введи тікер або назву компанії.');
+    if (!candidates.trim()) {
+      setErrorMessage('Додай список тікерів для перевірки.');
       return;
     }
 
@@ -26,11 +24,11 @@ export function StockAnalyzer() {
     setErrorMessage('');
 
     try {
-      const params = new URLSearchParams({ query });
-
-      if (entryPrice.trim()) params.set('entryPrice', entryPrice.trim());
-
-      const response = await fetch(`/api/stocks/analyze?${params.toString()}`);
+      const response = await fetch('/api/stocks/filter', {
+        body: JSON.stringify({ budget, candidates }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      });
       const payload = (await response.json()) as unknown;
 
       if (!isRecord(payload)) {
@@ -38,18 +36,18 @@ export function StockAnalyzer() {
       }
 
       if (!response.ok) {
-        throw new Error(String(payload.error || 'Не вдалося виконати аналіз.'));
+        throw new Error(String(payload.error || 'Не вдалося виконати фільтр.'));
       }
 
-      if (!isRecord(payload.analysis)) {
-        throw new Error(String(payload.error || 'Тікер не знайдено.'));
+      if (!isRecord(payload.result)) {
+        throw new Error('Сервер не повернув результат фільтра.');
       }
 
-      setResult(payload.analysis as StockAnalysisResult);
+      setResult(payload.result as MonthlyFilterResultType);
     } catch (error) {
       setResult(null);
       setErrorMessage(
-        error instanceof Error ? error.message : 'Не вдалося виконати аналіз.'
+        error instanceof Error ? error.message : 'Не вдалося виконати фільтр.'
       );
     } finally {
       setIsLoading(false);
@@ -60,29 +58,41 @@ export function StockAnalyzer() {
     <div className={styles.shell}>
       <section className={styles.inputCard}>
         <div>
-          <span>Stock Analyzer</span>
-          <h2>Аналіз акції перед рішенням</h2>
-          <p>Введи тікер або назву компанії та свою ціну входу.</p>
+          <span>Risk Filter</span>
+          <h2>Місячний фільтр акцій</h2>
+          <p>
+            Встав список ідей з Investing.com. Система відсіє ризикові акції та
+            розділить бюджет тільки між тими, що пройшли фільтр.
+          </p>
         </div>
 
         <label>
-          Тікер або компанія
-          <input value={tickerSymbol} onChange={event => setTickerSymbol(event.target.value)} placeholder="HIMX, ARM, QCOM, AMD" />
+          Місячний бюджет
+          <input
+            inputMode="decimal"
+            onChange={event => setBudget(event.target.value)}
+            placeholder="300"
+            value={budget}
+          />
         </label>
 
         <label>
-          Ціна входу
-          <input inputMode="decimal" value={entryPrice} onChange={event => setEntryPrice(event.target.value)} placeholder="21.91" />
+          Тікери або компанії
+          <textarea
+            onChange={event => setCandidates(event.target.value)}
+            placeholder="MRVL HIMX AAPL AMD"
+            value={candidates}
+          />
         </label>
 
         <button type="button" onClick={handleAnalyze} disabled={isLoading}>
-          {isLoading ? 'Analyzing...' : 'Analyze'}
+          {isLoading ? 'Аналізую...' : 'Проаналізувати список'}
         </button>
 
         {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}
       </section>
 
-      {result ? <AnalyzerResult result={result} /> : null}
+      {result ? <MonthlyFilterResult result={result} /> : null}
     </div>
   );
 }

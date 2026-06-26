@@ -27,8 +27,29 @@ export function formatPercent(value: number | null) {
 }
 
 export function getDecisionTone(value: string) {
-  if (value === 'Pass' || value === 'profit') return 'pass';
-  if (value === 'Warning' || value === 'neutral') return 'warning';
+  if (value === 'Pass' || value === 'profit' || value === 'buy' || value === 'low') {
+    return 'pass';
+  }
+
+  if (value === 'Warning' || value === 'neutral' || value === 'watch' || value === 'medium') {
+    return 'warning';
+  }
 
   return 'reject';
+}
+
+export function getDecisionLabel(value: string) {
+  if (value === 'buy') return 'Купити';
+  if (value === 'watch') return 'Спостерігати';
+  if (value === 'avoid') return 'Уникати';
+
+  return value;
+}
+
+export function getRiskLabel(value: string) {
+  if (value === 'low') return 'низький';
+  if (value === 'medium') return 'середній';
+  if (value === 'high') return 'високий';
+
+  return value;
 }
