@@ -11,6 +11,10 @@ async function resolveTickerSymbol(query: string) {
     return '';
   }
 
+  if (/^[A-Z0-9.-]{1,12}$/.test(normalizedQuery)) {
+    return normalizedQuery;
+  }
+
   const matches = await searchMarketSymbols(normalizedQuery);
   const exactMatch = matches.find(match => match.symbol.toUpperCase() === normalizedQuery);
 

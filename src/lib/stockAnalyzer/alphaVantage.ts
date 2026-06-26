@@ -1,4 +1,4 @@
-import { fetchStockNews } from './alphaVantageNews';
+import { quoteMarketSymbol } from '@/lib/marketData';
 import type { NormalizedStockData, StockNewsItem } from './types';
 import { fetchProviderJson, isRecord, readNumber, readString } from './providerUtils';
 
@@ -31,28 +31,6 @@ function toPercent(value: number | null) {
   return value === null ? null : value * 100;
 }
 
-function changePercent(current: number | null, previous: number | null) {
-  if (!current || !previous || previous <= 0) {
-    return null;
-  }
-
-  return ((current - previous) / previous) * 100;
-}
-
-function getPerformanceFromSeries(payload: unknown, targetIndex: number) {
-  if (!isRecord(payload) || !isRecord(payload['Time Series (Daily)'])) {
-    return null;
-  }
-
-  const rows = Object.entries(payload['Time Series (Daily)']);
-  const currentClose = readNumber(isRecord(rows[0]?.[1]) ? rows[0][1]['4. close'] : null);
-  const pastClose = readNumber(
-    isRecord(rows[targetIndex]?.[1]) ? rows[targetIndex][1]['4. close'] : null
-  );
-
-  return changePercent(currentClose, pastClose);
-}
-
 async function fetchOverview(symbol: string) {
   return fetchProviderJson(
     buildAlphaUrl({
@@ -62,41 +40,16 @@ async function fetchOverview(symbol: string) {
   );
 }
 
-async function fetchQuote(symbol: string) {
-  const payload = await fetchProviderJson(
-    buildAlphaUrl({
-      function: 'GLOBAL_QUOTE',
-      symbol,
-    })
-  );
-
-  return isRecord(payload) && isRecord(payload['Global Quote'])
-    ? payload['Global Quote']
-    : {};
-}
-
-async function fetchPerformance(symbol: string): Promise<PerformanceSet> {
-  try {
-    const payload = await fetchProviderJson(
-      buildAlphaUrl({
-        function: 'TIME_SERIES_DAILY',
-        outputsize: 'full',
-        symbol,
-      })
-    );
-
-    return {
-      oneMonthPerformance: getPerformanceFromSeries(payload, 21),
-      oneYearPerformance: getPerformanceFromSeries(payload, 252),
-      threeMonthPerformance: getPerformanceFromSeries(payload, 63),
-    };
-  } catch {
-    return {
-      oneMonthPerformance: null,
-      oneYearPerformance: null,
-      threeMonthPerformance: null,
-    };
+function getQuoteFromMarketData(
+  quote: Awaited<ReturnType<typeof quoteMarketSymbol>> | null
+) {
+  if (!quote) {
+    return {};
   }
+
+  return {
+    '05. price': quote.price,
+  };
 }
 
 export function normalizeStockData(
@@ -137,12 +90,20 @@ export function normalizeStockData(
 
 export async function fetchStockData(symbol: string) {
   const normalizedSymbol = symbol.trim().toUpperCase();
-  const [overview, quote, performance, news] = await Promise.all([
+  const [overview, quote] = await Promise.all([
     fetchOverview(normalizedSymbol),
-    fetchQuote(normalizedSymbol),
-    fetchPerformance(normalizedSymbol),
-    fetchStockNews(normalizedSymbol),
+    quoteMarketSymbol(normalizedSymbol),
   ]);
 
-  return normalizeStockData(normalizedSymbol, overview, quote, performance, news);
+  return normalizeStockData(
+    normalizedSymbol,
+    overview,
+    getQuoteFromMarketData(quote),
+    {
+      oneMonthPerformance: null,
+      oneYearPerformance: null,
+      threeMonthPerformance: null,
+    },
+    []
+  );
 }

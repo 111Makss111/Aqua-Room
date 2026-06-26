@@ -33,8 +33,12 @@ export function StockAnalyzer() {
       const response = await fetch(`/api/stocks/analyze?${params.toString()}`);
       const payload = (await response.json()) as unknown;
 
-      if (!response.ok || !isRecord(payload)) {
-        throw new Error('Analyze failed');
+      if (!isRecord(payload)) {
+        throw new Error('Не вдалося прочитати відповідь сервера.');
+      }
+
+      if (!response.ok) {
+        throw new Error(String(payload.error || 'Не вдалося виконати аналіз.'));
       }
 
       if (!isRecord(payload.analysis)) {

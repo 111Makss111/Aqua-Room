@@ -28,9 +28,12 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ analysis });
   } catch (error) {
-    const message =
-      error instanceof Error && error.message === 'Ticker was not found'
-        ? 'Тікер не знайдено або провайдер не повернув дані.'
+    const errorText = error instanceof Error ? error.message : '';
+    const isMissingKey = errorText.includes('ALPHA_VANTAGE_API_KEY');
+    const message = isMissingKey
+      ? 'Не додано Alpha Vantage API key для аналізу акцій.'
+      : errorText === 'Ticker was not found'
+        ? 'Не вдалося отримати дані по цьому тікеру. Перевір тікер або ліміт API.'
         : 'Не вдалося виконати аналіз акції.';
 
     return NextResponse.json({ error: message }, { status: 502 });
