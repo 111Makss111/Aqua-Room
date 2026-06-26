@@ -1,0 +1,144 @@
+.shell {
+  display: grid;
+  gap: 16px;
+}
+
+.inputCard,
+.card,
+.heroCard {
+  border: 1px solid rgb(148 163 184 / 0.13);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.025)),
+    rgb(12 25 43 / 0.86);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.2);
+}
+
+.inputCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 0.42fr) minmax(160px, 0.28fr) auto;
+  gap: 14px;
+  align-items: end;
+  padding: 20px;
+}
+
+.inputCard span,
+.card span,
+.heroCard span {
+  color: #55e6a0;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inputCard h2,
+.heroCard h2 {
+  margin: 6px 0;
+  color: #f8fbff;
+}
+
+.inputCard p,
+.card p,
+.heroCard p,
+.muted {
+  color: rgb(203 213 225 / 0.72);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.inputCard label {
+  display: grid;
+  gap: 7px;
+  color: rgb(203 213 225 / 0.76);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.inputCard input {
+  border: 1px solid rgb(148 163 184 / 0.16);
+  border-radius: 8px;
+  padding: 12px;
+  color: #f8fbff;
+  font: inherit;
+  background: rgb(7 17 31 / 0.82);
+}
+
+.inputCard button {
+  min-height: 44px;
+  border: 1px solid rgb(52 211 153 / 0.36);
+  border-radius: 8px;
+  padding: 0 18px;
+  color: #04111b;
+  font: inherit;
+  font-weight: 900;
+  background: linear-gradient(135deg, #55e6a0, #2dd17f);
+}
+
+.inputCard button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.error {
+  grid-column: 1 / -1;
+  color: #fecaca;
+}
+
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.heroCard {
+  grid-column: 1 / -1;
+  padding: 20px;
+}
+
+.card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 18px;
+}
+
+.card strong {
+  color: #f8fbff;
+  font-size: 28px;
+}
+
+.pass {
+  color: #55e6a0 !important;
+}
+
+.warning {
+  color: #facc15 !important;
+}
+
+.reject {
+  color: #fca5a5 !important;
+}
+
+.cleanList,
+.metricList {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 18px;
+  color: rgb(203 213 225 / 0.78);
+}
+
+.scoreBar {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(148 163 184 / 0.16);
+}
+
+.scoreBar i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #fca5a5, #facc15, #55e6a0);
+}

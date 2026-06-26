@@ -3,6 +3,7 @@
 import type { Session } from 'next-auth';
 import { signOut } from 'next-auth/react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { StockAnalyzer } from './analyzer/StockAnalyzer';
 import { PortfolioDashboard } from './dashboard/PortfolioDashboard';
 
 type RoomWorkspaceProps = {
@@ -38,6 +39,13 @@ const navigationItems = [
     marker: 'AC',
     title: 'Поточні активи',
     subtitle: 'Позиції, частки, середня ціна та ризики концентрації.',
+  },
+  {
+    id: 'analyzer',
+    label: 'Аналіз акцій',
+    marker: 'SA',
+    title: 'Stock Analyzer',
+    subtitle: 'Перевірка тікера, ризиків, ціни входу та рішення Pass / Warning / Reject.',
   },
   {
     id: 'ledger',
@@ -1023,6 +1031,11 @@ function ModulePreview({ activeId }: { activeId: NavigationId }) {
       title: 'Позиції',
       text: 'Поточний розділ активів має окремий екран.',
     },
+    analyzer: {
+      tag: 'Аналіз',
+      title: 'Stock Analyzer',
+      text: 'Поточний розділ аналізу акцій має окремий екран.',
+    },
     ledger: {
       tag: 'Журнал',
       title: 'Операції',
@@ -1467,7 +1480,9 @@ export function RoomWorkspace({ user }: RoomWorkspaceProps) {
           />
         ) : null}
 
-        {!['dashboard', 'ledger', 'holdings'].includes(activeNavId) ? (
+        {activeNavId === 'analyzer' ? <StockAnalyzer /> : null}
+
+        {!['dashboard', 'ledger', 'holdings', 'analyzer'].includes(activeNavId) ? (
           <ModulePreview activeId={activeNavId} />
         ) : null}
       </section>

@@ -62,3 +62,5 @@ notes/
 *.njsproj
 *.sln
 *.sw?
+
+.env.example
